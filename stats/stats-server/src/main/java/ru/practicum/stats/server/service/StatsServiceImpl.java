@@ -1,12 +1,12 @@
-package ru.practicum.stats_server.service;
+package ru.practicum.stats.server.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.stats_dto.EndpointHit;
-import ru.practicum.stats_dto.ViewStats;
-import ru.practicum.stats_server.mapper.StatsMapper;
-import ru.practicum.stats_server.repository.StatsRepository;
+import ru.practicum.stats.dto.EndpointHitDto;
+import ru.practicum.stats.dto.ViewStatsDto;
+import ru.practicum.stats.server.mapper.StatsMapper;
+import ru.practicum.stats.server.repository.StatsRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,14 +20,13 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     @Transactional
-    public void addHit(EndpointHit endpointHit) {
-        statsRepository.save(StatsMapper.endpointToStats(endpointHit,
-                LocalDateTime.parse(endpointHit.getTimestamp(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+    public void addHit(EndpointHitDto endpointHitDto) {
+        statsRepository.save(StatsMapper.endpointToStats(endpointHitDto,
+                LocalDateTime.parse(endpointHitDto.getTimestamp(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         if (uris == null || uris.isEmpty()) {
             if (unique) {
                 return statsRepository.getAllStatsDistinctIp(start, end);

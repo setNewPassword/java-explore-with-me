@@ -1,4 +1,4 @@
-package ru.practicum.stats_client;
+package ru.practicum.stats.client;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
-public class BaseClient {
+public abstract class BaseClient {
     private final RestTemplate restTemplate;
 
     public BaseClient(RestTemplate restTemplate) {

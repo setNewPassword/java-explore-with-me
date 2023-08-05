@@ -1,4 +1,4 @@
-package ru.practicum.stats_server.controller;
+package ru.practicum.stats.server.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.stats_dto.EndpointHit;
-import ru.practicum.stats_dto.ViewStats;
-import ru.practicum.stats_server.service.StatsService;
+import ru.practicum.stats.dto.EndpointHitDto;
+import ru.practicum.stats.dto.ViewStatsDto;
+import ru.practicum.stats.server.service.StatsService;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -26,15 +26,15 @@ public class StatsController {
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addHit(@Valid @RequestBody EndpointHit endpointHit) {
-        statsService.addHit(endpointHit);
+    public void addHit(@Valid @RequestBody EndpointHitDto endpointHitDto) {
+        statsService.addHit(endpointHitDto);
     }
 
     @GetMapping("/stats")
-    public List<ViewStats> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
-                                    @RequestParam(required = false) List<String> uris,
-                                    @RequestParam(required = false, defaultValue = "false") Boolean unique) {
+    public List<ViewStatsDto> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
+                                       @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+                                       @RequestParam(required = false) List<String> uris,
+                                       @RequestParam(required = false, defaultValue = "false") Boolean unique) {
         if (start.isAfter(end)) {
             throw new IllegalArgumentException("Неверно указан временной интервал!");
         }

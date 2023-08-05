@@ -1,4 +1,4 @@
-package ru.practicum.stats_dto;
+package ru.practicum.stats.dto;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ViewStats {
+public class ViewStatsDto {
     private String app;
     private String uri;
     private Long hits;

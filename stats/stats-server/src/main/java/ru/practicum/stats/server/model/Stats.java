@@ -1,4 +1,4 @@
-package ru.practicum.stats_server.model;
+package ru.practicum.stats.server.model;
 
 import lombok.*;
 
