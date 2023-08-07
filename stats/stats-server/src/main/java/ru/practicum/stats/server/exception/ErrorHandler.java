@@ -20,7 +20,6 @@ public class ErrorHandler {
             MethodArgumentNotValidException.class,
             MethodArgumentTypeMismatchException.class,
             IllegalArgumentException.class,
-            ClassCastException.class,
             ConstraintViolationException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
