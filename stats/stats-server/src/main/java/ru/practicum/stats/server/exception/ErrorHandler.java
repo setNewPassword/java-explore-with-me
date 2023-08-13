@@ -3,6 +3,7 @@ package ru.practicum.stats.server.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,7 +21,8 @@ public class ErrorHandler {
             MethodArgumentNotValidException.class,
             MethodArgumentTypeMismatchException.class,
             IllegalArgumentException.class,
-            ConstraintViolationException.class
+            ConstraintViolationException.class,
+            MissingServletRequestParameterException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequest(final Throwable e) {

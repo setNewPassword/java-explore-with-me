@@ -26,6 +26,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         if (uris == null || uris.isEmpty()) {
             if (unique) {
@@ -35,8 +36,12 @@ public class StatsServiceImpl implements StatsService {
             }
         } else {
             if (unique) {
+                uris.replaceAll(s -> s.replace("[", ""));
+                uris.replaceAll(s -> s.replace("]", ""));
                 return statsRepository.getStatsByUrisDistinctIp(start, end, uris);
             } else {
+                uris.replaceAll(s -> s.replace("[", ""));
+                uris.replaceAll(s -> s.replace("]", ""));
                 return statsRepository.getStatsByUris(start, end, uris);
             }
         }
