@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.ewm.enums.UserState;
+import ru.practicum.ewm.model.UserState;
 import ru.practicum.ewm.model.Location;
-import ru.practicum.ewm.model.Pattern;
+import ru.practicum.ewm.model.Formats;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public class UpdateEventUserRequest {
     private Long category;
     @Size(min = 20, max = 7000)
     private String description;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Pattern.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
     private LocalDateTime eventDate;
     private Location location;
     private Boolean paid;

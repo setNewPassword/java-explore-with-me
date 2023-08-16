@@ -30,8 +30,10 @@ public class EventAdminController {
                                         @RequestParam(name = "categories", required = false) List<Long> categoriesId,
                                         @RequestParam(name = "rangeStart", required = false) String rangeStart,
                                         @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
-                                        @RequestParam(name = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
-                                        @RequestParam(name = "size", required = false, defaultValue = "10") @Positive Integer size,
+                                        @RequestParam(name = "from", required = false, defaultValue = "0")
+                                            @PositiveOrZero Integer from,
+                                        @RequestParam(name = "size", required = false, defaultValue = "10")
+                                            @Positive Integer size,
                                         HttpServletRequest servletRequest) {
         return eventService.getAllEventsByAdmin(users, states, categoriesId, rangeStart, rangeEnd,
                 PageRequest.of(from / size, size), servletRequest);

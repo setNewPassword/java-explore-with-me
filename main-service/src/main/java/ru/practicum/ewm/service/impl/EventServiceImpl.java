@@ -8,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.event.*;
-import ru.practicum.ewm.enums.*;
 import ru.practicum.ewm.exception.*;
 import ru.practicum.ewm.model.*;
 import ru.practicum.ewm.repository.*;
@@ -33,8 +32,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final StatsClient statsClient;
     private final LocationRepository locationRepository;
-    private final String datePattern = Pattern.DATE;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern);
+    private static final DateTimeFormatter DATE_FORMATTER = Formats.DATE_FORMATTER;
 
     @Override
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
@@ -45,7 +43,7 @@ public class EventServiceImpl implements EventService {
         checkEventTime(newEventDto.getEventDate());
         Event eventToSave = eventMapper.toEventModel(newEventDto);
         eventToSave.setState(EventState.PENDING);
-        eventToSave.setConfirmedRequests(0L);
+        eventToSave.setConfirmedRequests(0);
         eventToSave.setCreatedOn(LocalDateTime.now());
 
         Category category = categoryRepository.findById(newEventDto.getCategory())
@@ -200,14 +198,14 @@ public class EventServiceImpl implements EventService {
 
         LocalDateTime start;
         if (rangeStart != null && !rangeStart.isEmpty()) {
-            start = LocalDateTime.parse(rangeStart, dateFormatter);
+            start = LocalDateTime.parse(rangeStart, DATE_FORMATTER);
         } else {
             start = LocalDateTime.now().plusYears(5);
         }
 
         LocalDateTime end;
         if (rangeEnd != null && !rangeEnd.isEmpty()) {
-            end = LocalDateTime.parse(rangeEnd, dateFormatter);
+            end = LocalDateTime.parse(rangeEnd, DATE_FORMATTER);
         } else {
             end = LocalDateTime.now().plusYears(5);
         }
@@ -275,8 +273,8 @@ public class EventServiceImpl implements EventService {
         LocalDateTime end = null;
 
         if (rangeStart != null && rangeEnd != null) {
-            start = LocalDateTime.parse(rangeStart, dateFormatter);
-            end = LocalDateTime.parse(rangeEnd, dateFormatter);
+            start = LocalDateTime.parse(rangeStart, DATE_FORMATTER);
+            end = LocalDateTime.parse(rangeEnd, DATE_FORMATTER);
             if (start.isAfter(end)) {
                 throw new EventValidationException("Время начала события не может быть позже времени его окончания.");
             }

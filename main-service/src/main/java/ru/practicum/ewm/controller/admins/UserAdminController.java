@@ -9,6 +9,8 @@ import ru.practicum.ewm.dto.user.UserDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,8 +27,8 @@ public class UserAdminController {
 
     @GetMapping
     public List<UserDto> getUsers(@RequestParam(required = false, name = "ids") List<Long> ids,
-                                  @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                  @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
+                                  @RequestParam(name = "size", defaultValue = "10") @Positive Integer size) {
         return userService.getUsers(ids, PageRequest.of(from / size, size));
     }
 

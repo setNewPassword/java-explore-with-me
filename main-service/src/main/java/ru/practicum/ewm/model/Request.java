@@ -3,7 +3,6 @@ package ru.practicum.ewm.model;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import ru.practicum.ewm.enums.RequestStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

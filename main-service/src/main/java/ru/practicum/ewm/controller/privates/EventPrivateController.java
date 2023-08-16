@@ -12,9 +12,11 @@ import ru.practicum.ewm.dto.event.NewEventDto;
 import ru.practicum.ewm.dto.event.UpdateEventUserRequest;
 import ru.practicum.ewm.dto.request.RequestDto;
 import ru.practicum.ewm.dto.request.RequestStatusUpdateDto;
-import ru.practicum.ewm.dto.request.RequestStatusUpdateResult;
+import ru.practicum.ewm.dto.request.RequestStatusUpdateResultDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -34,9 +36,9 @@ public class EventPrivateController {
     @GetMapping
     public List<EventShortDto> getEventsByUser(@PathVariable Long userId,
                                                @RequestParam(name = "from", defaultValue = "0",
-                                                       required = false) Integer from,
+                                                       required = false) @PositiveOrZero Integer from,
                                                @RequestParam(name = "size", defaultValue = "10",
-                                                       required = false) Integer size) {
+                                                       required = false) @Positive Integer size) {
         return eventService.getEvents(userId, PageRequest.of(from / size, size));
     }
 
@@ -46,8 +48,8 @@ public class EventPrivateController {
     }
 
     @PatchMapping("/{eventId}/requests")
-    public RequestStatusUpdateResult updateRequests(@PathVariable Long userId, @PathVariable Long eventId,
-                                                    @RequestBody RequestStatusUpdateDto requestStatusUpdateDto) {
+    public RequestStatusUpdateResultDto updateRequests(@PathVariable Long userId, @PathVariable Long eventId,
+                                                       @RequestBody RequestStatusUpdateDto requestStatusUpdateDto) {
         return requestService.updateRequests(userId, eventId, requestStatusUpdateDto);
     }
 

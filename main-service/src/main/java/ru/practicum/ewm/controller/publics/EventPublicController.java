@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.service.EventService;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
-import ru.practicum.ewm.enums.EventSortValue;
+import ru.practicum.ewm.model.EventSortValue;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -26,8 +28,8 @@ public class EventPublicController {
             @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
             @RequestParam(name = "onlyAvailable", required = false) boolean onlyAvailable,
             @RequestParam(name = "sort", required = false) EventSortValue sort,
-            @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
-            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "from", required = false, defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(name = "size", required = false, defaultValue = "10") @Positive Integer size,
             HttpServletRequest request) {
         return eventService.getAllEventsByPublic(
                 text,

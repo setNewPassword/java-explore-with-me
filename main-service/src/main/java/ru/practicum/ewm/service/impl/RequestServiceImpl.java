@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.request.RequestDto;
 import ru.practicum.ewm.dto.request.RequestStatusUpdateDto;
-import ru.practicum.ewm.dto.request.RequestStatusUpdateResult;
-import ru.practicum.ewm.enums.EventState;
-import ru.practicum.ewm.enums.UpdateRequestStatus;
-import ru.practicum.ewm.enums.RequestStatus;
+import ru.practicum.ewm.dto.request.RequestStatusUpdateResultDto;
+import ru.practicum.ewm.model.EventState;
+import ru.practicum.ewm.model.UpdateRequestStatus;
+import ru.practicum.ewm.model.RequestStatus;
 import ru.practicum.ewm.exception.*;
 import ru.practicum.ewm.mapper.RequestMapper;
 import ru.practicum.ewm.model.Event;
@@ -104,11 +104,11 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional
     @Override
-    public RequestStatusUpdateResult updateRequests(Long userId, Long eventId,
-                                                    RequestStatusUpdateDto requestStatusUpdateDto) {
+    public RequestStatusUpdateResultDto updateRequests(Long userId, Long eventId,
+                                                       RequestStatusUpdateDto requestStatusUpdateDto) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
-        RequestStatusUpdateResult result = new RequestStatusUpdateResult();
+        RequestStatusUpdateResultDto result = new RequestStatusUpdateResultDto();
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             return result;

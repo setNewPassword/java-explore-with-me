@@ -2,7 +2,7 @@ package ru.practicum.ewm.service;
 
 import org.springframework.data.domain.Pageable;
 import ru.practicum.ewm.dto.event.*;
-import ru.practicum.ewm.enums.EventSortValue;
+import ru.practicum.ewm.model.EventSortValue;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

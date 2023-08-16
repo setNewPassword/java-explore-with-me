@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.ewm.model.Pattern;
+import ru.practicum.ewm.model.Formats;
 import ru.practicum.ewm.model.Location;
 
 import javax.validation.constraints.NotNull;
@@ -26,7 +26,7 @@ public class NewEventDto {
     @Size(min = 20, max = 7000)
     private String description;
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Pattern.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
     private LocalDateTime eventDate;
     @NotNull
     private Location location;

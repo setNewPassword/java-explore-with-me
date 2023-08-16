@@ -19,7 +19,7 @@ public interface EventMapper {
 
     List<EventShortDto> toEventShortDtoList(List<Event> events);
 
-    EventFullDto toEventFullDto(Event save);
+    EventFullDto toEventFullDto(Event event);
 
     EventShortDto toEventShortDto(Event event);
 }

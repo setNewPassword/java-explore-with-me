@@ -5,10 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.ewm.dto.user.UserShortDto;
 import ru.practicum.ewm.dto.category.CategoryDto;
-import ru.practicum.ewm.model.Pattern;
-import ru.practicum.ewm.enums.EventState;
+import ru.practicum.ewm.dto.user.UserShortDto;
+import ru.practicum.ewm.model.Formats;
+import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.model.Location;
 
 import java.time.LocalDateTime;
@@ -17,25 +17,25 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventFullDto {
+public class EventFullDto /*extends EventShortDto*/ {
+    private Long id;
     private String annotation;
     private CategoryDto category;
     private Integer confirmedRequests;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Pattern.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
+    private LocalDateTime eventDate;
+    private UserShortDto initiator;
+    private Boolean paid;
+    private String title;
+    private Long views;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
     private String createdOn;
     private String description;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Pattern.DATE)
-    private LocalDateTime eventDate;
-    private Long id;
-    private UserShortDto initiator;
     private Location location;
-    private Boolean paid;
-    private Long participantLimit;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Pattern.DATE)
+    private Integer participantLimit;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
     private LocalDateTime publishedOn;
     private Boolean requestModeration;
     private EventState state;
-    private String title;
-    private Long views;
 }
