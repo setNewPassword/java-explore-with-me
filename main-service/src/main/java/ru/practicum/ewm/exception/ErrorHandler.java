@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 
 @RestControllerAdvice
 public class ErrorHandler {
-    private final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(Formats.DATE);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(Formats.DATE);
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
