@@ -29,7 +29,7 @@ public class NewEventDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
     private LocalDateTime eventDate;
     @NotNull
-    private Location location;
+    private LocationDto location;
     private boolean paid;
     private int participantLimit;
     private Boolean requestModeration = true;

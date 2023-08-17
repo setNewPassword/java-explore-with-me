@@ -37,14 +37,14 @@ public class StatsClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> addHit(String appName, String uri, String ip, LocalDateTime timestamp) {
+    public void addHit(String appName, String uri, String ip, LocalDateTime timestamp) {
         EndpointHitDto endpointHit = EndpointHitDto.builder()
                 .app(appName)
                 .uri(uri)
                 .ip(ip)
                 .timestamp(timestamp.format(formatter))
                 .build();
-        return post("/hit", endpointHit);
+        post("/hit", endpointHit);
     }
 
     public Long getStatistics(Long eventId) {

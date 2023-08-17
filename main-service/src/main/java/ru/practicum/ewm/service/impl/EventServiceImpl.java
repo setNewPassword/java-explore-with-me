@@ -12,6 +12,7 @@ import ru.practicum.ewm.exception.*;
 import ru.practicum.ewm.model.*;
 import ru.practicum.ewm.repository.*;
 import ru.practicum.ewm.mapper.EventMapper;
+import ru.practicum.ewm.mapper.LocationMapper;
 import ru.practicum.ewm.service.EventService;
 import ru.practicum.stats.client.StatsClient;
 
@@ -29,10 +30,12 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final EventMapper eventMapper;
+    private final LocationMapper locationMapper;
     private final UserRepository userRepository;
     private final StatsClient statsClient;
     private final LocationRepository locationRepository;
     private static final DateTimeFormatter DATE_FORMATTER = Formats.DATE_FORMATTER;
+    private static final String APP_NAME = "ewm-main-service";
 
     @Override
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
@@ -41,7 +44,10 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new UserNotExistException(String
                         .format("Пользователь с id = %d не найден.", userId)));
         checkEventTime(newEventDto.getEventDate());
+        Location location = locationMapper.toLocation(newEventDto.getLocation());
+        setIdToLocation(location);
         Event eventToSave = eventMapper.toEventModel(newEventDto);
+        eventToSave.setLocation(location);
         eventToSave.setState(EventState.PENDING);
         eventToSave.setConfirmedRequests(0);
         eventToSave.setCreatedOn(LocalDateTime.now());
@@ -53,6 +59,17 @@ public class EventServiceImpl implements EventService {
         eventToSave.setInitiator(user);
         Event saved = eventRepository.save(eventToSave);
         return eventMapper.toEventFullDto(saved);
+    }
+
+    private void setIdToLocation(Location location) {
+        Optional<Location> savedLocationOpt = locationRepository.findByLatAndLon(location.getLat(), location.getLat());
+        long locationId;
+        if (savedLocationOpt.isEmpty()) {
+            locationId = locationRepository.save(location).getId();
+        } else {
+            locationId = savedLocationOpt.get().getId();
+        }
+        location.setId(locationId);
     }
 
     private void checkEventTime(LocalDateTime start) {
@@ -295,7 +312,7 @@ public class EventServiceImpl implements EventService {
                 Sort.by(EventSortValue.EVENT_DATE.equals(sort) ? "eventDate" : "views"));
         List<Event> eventEntities = eventRepository.searchPublishedEvents(categories, paid, start, end, pageRequest)
                 .getContent();
-        statsClient.addHit("ewm-main-service",
+        statsClient.addHit(APP_NAME,
                 request.getRequestURI(),
                 request.getRemoteAddr(),
                 LocalDateTime.now());
@@ -334,7 +351,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
                 .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
 
-        statsClient.addHit("ewm-main-service",
+        statsClient.addHit(APP_NAME,
                 request.getRequestURI(),
                 request.getRemoteAddr(),
                 LocalDateTime.now());

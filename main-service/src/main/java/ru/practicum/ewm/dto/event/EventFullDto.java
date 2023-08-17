@@ -32,7 +32,7 @@ public class EventFullDto /*extends EventShortDto*/ {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
     private String createdOn;
     private String description;
-    private Location location;
+    private LocationDto location;
     private Integer participantLimit;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
     private LocalDateTime publishedOn;
