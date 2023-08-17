@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.compilation.NewCompilationDto;
-import ru.practicum.ewm.dto.compilation.UpdateCompilationRequestDto;
 import ru.practicum.ewm.exception.CompilationNotExistException;
 import ru.practicum.ewm.mapper.CompilationMapper;
 import ru.practicum.ewm.model.Compilation;
@@ -39,7 +38,7 @@ public class CompilationServiceImpl implements CompilationService {
         List<Event> events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
         Compilation compilation = new Compilation();
         compilation.setEvents(new HashSet<>(events));
-        compilation.setPinned(newCompilationDto.getPinned());
+        compilation.setPinned(newCompilationDto.isPinned());
         compilation.setTitle(newCompilationDto.getTitle());
 
         Compilation savedCompilation = compilationRepository.save(compilation);
@@ -54,7 +53,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public CompilationDto updateCompilation(Long compId, UpdateCompilationRequestDto updateCompilationRequestDto) {
+    public CompilationDto updateCompilation(Long compId, NewCompilationDto updateCompilationRequestDto) {
         Compilation oldCompilation = compilationRepository.findById(compId)
                 .orElseThrow(() ->
                         new CompilationNotExistException(String.format("Невозможно обновить подборку — " +
@@ -64,8 +63,8 @@ public class CompilationServiceImpl implements CompilationService {
             List<Event> events = eventRepository.findAllByIdIn(updateCompilationRequestDto.getEvents());
             oldCompilation.setEvents(new HashSet<>(events));
         }
-        if (updateCompilationRequestDto.getPinned() != null) {
-            oldCompilation.setPinned(updateCompilationRequestDto.getPinned());
+        if (updateCompilationRequestDto.isPinned()) {
+            oldCompilation.setPinned(true);
         }
         if (updateCompilationRequestDto.getTitle() != null) {
             oldCompilation.setTitle(updateCompilationRequestDto.getTitle());

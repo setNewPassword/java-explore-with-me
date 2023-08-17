@@ -20,7 +20,7 @@ public class Compilation {
     private Long id;
 
     @Column(nullable = false)
-    private Boolean pinned;
+    private boolean pinned;
 
     @Column(nullable = false, length = 50, unique = true)
     private String title;
