@@ -9,18 +9,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.exception.*;
-import ru.practicum.ewm.model.*;
-import ru.practicum.ewm.repository.*;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.mapper.LocationMapper;
+import ru.practicum.ewm.model.*;
+import ru.practicum.ewm.repository.CategoryRepository;
+import ru.practicum.ewm.repository.EventRepository;
+import ru.practicum.ewm.repository.LocationRepository;
+import ru.practicum.ewm.repository.UserRepository;
 import ru.practicum.ewm.service.EventService;
 import ru.practicum.stats.client.StatsClient;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -310,7 +311,13 @@ public class EventServiceImpl implements EventService {
         }
         final Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 Sort.by(EventSortValue.EVENT_DATE.equals(sort) ? "eventDate" : "views"));
-        List<Event> eventEntities = eventRepository.searchPublishedEvents(categories, paid, start, end, pageRequest)
+        List<Event> eventEntities = eventRepository.searchPublishedEvents(
+                        categories,
+                        paid,
+                        start,
+                        end,
+                        (text != null && !text.isEmpty() ? text.toLowerCase() : ""),
+                        pageRequest)
                 .getContent();
         statsClient.addHit(APP_NAME,
                 request.getRequestURI(),
@@ -320,17 +327,9 @@ public class EventServiceImpl implements EventService {
         if (eventEntities.isEmpty()) {
             return Collections.emptyList();
         }
-        java.util.function.Predicate<Event> eventEntityPredicate;
-        if (text != null && !text.isEmpty()) {
-            eventEntityPredicate = eventEntity -> eventEntity.getAnnotation().toLowerCase().contains(text.toLowerCase())
-                    || eventEntity.getDescription().toLowerCase().contains(text.toLowerCase());
-        } else {
-            eventEntityPredicate = eventEntity -> true;
-        }
 
         Set<Long> eventIds = eventEntities
                 .stream()
-                .filter(eventEntityPredicate)
                 .map(Event::getId)
                 .collect(Collectors.toSet());
         Map<Long, Long> viewStatsMap = statsClient.getSetViews(eventIds);

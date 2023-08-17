@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.model.Event;
+import ru.practicum.ewm.model.EventState;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,12 +29,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "JOIN e.category " +
             "WHERE ((:categoryIds) is null or e.category.id IN (:categoryIds)) " +
             "AND e.state = 'PUBLISHED' " +
+            "AND (lower(e.annotation) like %:text% or lower(e.description) like %:text%) " +
             "AND ((:paid) is null or paid is (:paid)) " +
             "AND e.eventDate BETWEEN (:rangeStart) AND (:rangeEnd)")
     Page<Event> searchPublishedEvents(@Param("categoryIds") List<Long> categoryIds,
                                       @Param("paid") Boolean paid,
                                       @Param("rangeStart") LocalDateTime start,
                                       @Param("rangeEnd") LocalDateTime end,
+                                      @Param("text") String text,
                                       Pageable pageable);
 
     @Query("SELECT e FROM Event e " +

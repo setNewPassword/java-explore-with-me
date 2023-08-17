@@ -5,11 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.ewm.model.UserState;
-import ru.practicum.ewm.model.Location;
 import ru.practicum.ewm.model.Formats;
+import ru.practicum.ewm.model.Location;
+import ru.practicum.ewm.model.UserState;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Getter

@@ -3,10 +3,10 @@ package ru.practicum.ewm.controller.admins;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.service.CompilationService;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.compilation.NewCompilationDto;
 import ru.practicum.ewm.dto.compilation.UpdateCompilationRequestDto;
+import ru.practicum.ewm.service.CompilationService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

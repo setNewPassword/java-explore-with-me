@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.service.UserService;
 import ru.practicum.ewm.dto.user.UserDto;
+import ru.practicum.ewm.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

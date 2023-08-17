@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.service.RequestService;
 import ru.practicum.ewm.dto.request.RequestDto;
+import ru.practicum.ewm.service.RequestService;
 
 import java.util.List;
 

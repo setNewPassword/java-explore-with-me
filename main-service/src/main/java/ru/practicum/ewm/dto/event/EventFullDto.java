@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.user.UserShortDto;
-import ru.practicum.ewm.model.Formats;
 import ru.practicum.ewm.model.EventState;
+import ru.practicum.ewm.model.Formats;
 
 import java.time.LocalDateTime;
 

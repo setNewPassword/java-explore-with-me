@@ -3,10 +3,10 @@ package ru.practicum.ewm.controller.publics;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.service.EventService;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.model.EventSortValue;
+import ru.practicum.ewm.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
