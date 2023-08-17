@@ -40,11 +40,12 @@ public class EventPublicController {
                 onlyAvailable,
                 sort,
                 PageRequest.of(from / size, size),
-                request);
+                request.getRequestURI(),
+                request.getRemoteAddr());
     }
 
     @GetMapping("/{id}")
     public EventFullDto getEvent(@PathVariable Long id, HttpServletRequest request) {
-        return eventService.getEvent(id, request);
+        return eventService.getEvent(id, request.getRequestURI(), request.getRemoteAddr());
     }
 }

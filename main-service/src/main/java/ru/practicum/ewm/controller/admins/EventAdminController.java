@@ -9,7 +9,6 @@ import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.UpdateEventAdminRequest;
 import ru.practicum.ewm.service.EventService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -33,10 +32,9 @@ public class EventAdminController {
                                         @RequestParam(name = "from", required = false, defaultValue = "0")
                                             @PositiveOrZero Integer from,
                                         @RequestParam(name = "size", required = false, defaultValue = "10")
-                                            @Positive Integer size,
-                                        HttpServletRequest servletRequest) {
+                                            @Positive Integer size) {
         return eventService.getAllEventsByAdmin(users, states, categoriesId, rangeStart, rangeEnd,
-                PageRequest.of(from / size, size), servletRequest);
+                PageRequest.of(from / size, size));
     }
 
 

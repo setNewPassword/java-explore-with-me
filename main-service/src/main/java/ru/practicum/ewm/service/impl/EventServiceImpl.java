@@ -19,7 +19,6 @@ import ru.practicum.ewm.repository.UserRepository;
 import ru.practicum.ewm.service.EventService;
 import ru.practicum.stats.client.StatsClient;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -199,8 +198,7 @@ public class EventServiceImpl implements EventService {
                                                   List<Long> categories,
                                                   String rangeStart,
                                                   String rangeEnd,
-                                                  Pageable pageable,
-                                                  HttpServletRequest request) {
+                                                  Pageable pageable) {
 
         if (states == null & rangeStart == null & rangeEnd == null) {
             return eventRepository.findAll(pageable)
@@ -285,7 +283,8 @@ public class EventServiceImpl implements EventService {
                                                     Boolean onlyAvailable,
                                                     EventSortValue sort,
                                                     Pageable pageable,
-                                                    HttpServletRequest request) {
+                                                    String uri,
+                                                    String ip) {
 
         LocalDateTime start = null;
         LocalDateTime end = null;
@@ -319,10 +318,7 @@ public class EventServiceImpl implements EventService {
                         (text != null && !text.isEmpty() ? text.toLowerCase() : ""),
                         pageRequest)
                 .getContent();
-        statsClient.addHit(APP_NAME,
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now());
+        statsClient.addHit(APP_NAME, uri, ip, LocalDateTime.now());
 
         if (eventEntities.isEmpty()) {
             return Collections.emptyList();
@@ -345,15 +341,12 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getEvent(Long eventId, HttpServletRequest request) {
+    public EventFullDto getEvent(Long eventId, String uri, String ip) {
 
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
                 .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
 
-        statsClient.addHit(APP_NAME,
-                request.getRequestURI(),
-                request.getRemoteAddr(),
-                LocalDateTime.now());
+        statsClient.addHit(APP_NAME, uri, ip, LocalDateTime.now());
 
         Long views = statsClient.getStatistics(eventId);
 
