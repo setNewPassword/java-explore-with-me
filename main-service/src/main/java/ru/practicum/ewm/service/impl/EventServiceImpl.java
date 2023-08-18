@@ -86,7 +86,7 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getEvents(Long userId, Pageable pageable) {
         List<EventShortDto> result = new ArrayList<>();
         List<Event> eventsFromDb = eventRepository.findAllByInitiatorId(userId, pageable).toList();
-        for(Event event : eventsFromDb) {
+        for (Event event : eventsFromDb) {
             result.add(eventMapper.toEventShortDto(event));
         }
         return result;
