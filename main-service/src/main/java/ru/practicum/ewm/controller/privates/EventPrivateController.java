@@ -18,6 +18,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +31,9 @@ public class EventPrivateController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable Long userId, @Valid @RequestBody NewEventDto newEventDto) {
+        newEventDto.setRequestModeration(Objects.requireNonNullElse(newEventDto.getRequestModeration(), true));
+        newEventDto.setPaid(Objects.requireNonNullElse(newEventDto.getPaid(), false));
+        newEventDto.setParticipantLimit(Objects.requireNonNullElse(newEventDto.getParticipantLimit(), 0));
         return eventService.createEvent(userId, newEventDto);
     }
 
