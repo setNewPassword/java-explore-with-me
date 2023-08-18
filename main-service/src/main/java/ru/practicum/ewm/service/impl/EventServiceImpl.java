@@ -7,7 +7,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.dto.event.*;
+import ru.practicum.ewm.dto.event.EventFullDto;
+import ru.practicum.ewm.dto.event.EventShortDto;
+import ru.practicum.ewm.dto.event.NewEventDto;
+import ru.practicum.ewm.dto.event.UpdateEventRequest;
 import ru.practicum.ewm.exception.*;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.mapper.LocationMapper;
@@ -85,7 +88,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
+    public EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequest updateEventAdminRequest) {
 
         Event eventToUpdate = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
@@ -93,7 +96,7 @@ public class EventServiceImpl implements EventService {
             checkEventTime(updateEventAdminRequest.getEventDate());
         }
         if (updateEventAdminRequest.getStateAction() != null) {
-            if (updateEventAdminRequest.getStateAction() == AdminState.PUBLISH_EVENT) {
+            if (updateEventAdminRequest.getStateAction() == StateAction.PUBLISH_EVENT) {
                 if (eventToUpdate.getState().equals(EventState.PENDING)) {
                     eventToUpdate.setState(EventState.PUBLISHED);
                     eventToUpdate.setPublishedOn(LocalDateTime.now());
@@ -103,7 +106,7 @@ public class EventServiceImpl implements EventService {
                             updateEventAdminRequest.getStateAction());
                 }
             }
-            if (updateEventAdminRequest.getStateAction() == AdminState.REJECT_EVENT) {
+            if (updateEventAdminRequest.getStateAction() == StateAction.REJECT_EVENT) {
                 if (eventToUpdate.getState().equals(EventState.PUBLISHED)) {
                     throw new AlreadyPublishedException("Событие может быть отклонено только в том случае, " +
                             "если оно еще не было опубликовано. " +
@@ -118,7 +121,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequest updateEventUserRequest) {
+    public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventRequest updateEventUserRequest) {
 
         Event eventFromDb = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
@@ -128,10 +131,10 @@ public class EventServiceImpl implements EventService {
                 throw new EventValidationException("Дата и время на которые намечено событие не может быть раньше, " +
                         "чем через два часа от текущего момента");
             }
-            if (UserState.SEND_TO_REVIEW == updateEventUserRequest.getStateAction()) {
+            if (StateAction.SEND_TO_REVIEW == updateEventUserRequest.getStateAction()) {
                 eventFromDb.setState(EventState.PENDING);
             }
-            if (UserState.CANCEL_REVIEW == updateEventUserRequest.getStateAction()) {
+            if (StateAction.CANCEL_REVIEW == updateEventUserRequest.getStateAction()) {
                 eventFromDb.setState(EventState.CANCELED);
             }
         } else {
@@ -144,26 +147,7 @@ public class EventServiceImpl implements EventService {
         return eventMapper.toEventFullDto(eventFromDb);
     }
 
-    private void updateEventEntity(UpdateEventAdminRequest event, Event eventToUpdate) {
-        eventToUpdate.setAnnotation(Objects.requireNonNullElse(event.getAnnotation(), eventToUpdate.getAnnotation()));
-        eventToUpdate.setCategory(event.getCategory() == null
-                ? eventToUpdate.getCategory()
-                : categoryRepository.findById(event.getCategory())
-                .orElseThrow(() -> new CategoryNotExistException(String
-                        .format("Не найдена категория с id = %d.", event.getCategory()))));
-        eventToUpdate.setDescription(Objects.requireNonNullElse(event.getDescription(), eventToUpdate.getDescription()));
-        eventToUpdate.setEventDate(Objects.requireNonNullElse(event.getEventDate(), eventToUpdate.getEventDate()));
-        eventToUpdate.setLocation(event.getLocation() == null
-                ? eventToUpdate.getLocation()
-                : locationRepository.findByLatAndLon(event.getLocation().getLat(), event.getLocation().getLon())
-                .orElse(new Location(null, event.getLocation().getLat(), event.getLocation().getLon())));
-        eventToUpdate.setPaid(Objects.requireNonNullElse(event.getPaid(), eventToUpdate.getPaid()));
-        eventToUpdate.setParticipantLimit(Objects.requireNonNullElse(event.getParticipantLimit(), eventToUpdate.getParticipantLimit()));
-        eventToUpdate.setRequestModeration(Objects.requireNonNullElse(event.getRequestModeration(), eventToUpdate.getRequestModeration()));
-        eventToUpdate.setTitle(Objects.requireNonNullElse(event.getTitle(), eventToUpdate.getTitle()));
-    }
-
-    private void updateEventEntity(UpdateEventUserRequest event, Event eventToUpdate) {
+    private void updateEventEntity(UpdateEventRequest event, Event eventToUpdate) {
         eventToUpdate.setAnnotation(Objects.requireNonNullElse(event.getAnnotation(), eventToUpdate.getAnnotation()));
         eventToUpdate.setCategory(event.getCategory() == null
                 ? eventToUpdate.getCategory()
