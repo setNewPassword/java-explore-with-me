@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.ewm.dto.event.constraint.NewEventConstraint;
+import ru.practicum.ewm.dto.event.constraint.UpdateEventConstraint;
 import ru.practicum.ewm.model.Formats;
 
 import javax.validation.constraints.NotNull;
@@ -16,23 +18,23 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewEventDto {
-    @NotNull
-    @Size(min = 20, max = 2000)
+    @NotNull(groups = NewEventConstraint.class)
+    @Size(min = 20, max = 2000, groups = {NewEventConstraint.class, UpdateEventConstraint.class})
     private String annotation;
     @NotNull
     private Long category;
-    @NotNull
-    @Size(min = 20, max = 7000)
+    @NotNull(groups = NewEventConstraint.class)
+    @Size(min = 20, max = 7000, groups = {NewEventConstraint.class, UpdateEventConstraint.class})
     private String description;
-    @NotNull
+    @NotNull(groups = NewEventConstraint.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
     private LocalDateTime eventDate;
-    @NotNull
+    @NotNull(groups = NewEventConstraint.class)
     private LocationDto location;
     private Boolean paid;
     private Integer participantLimit;
     private Boolean requestModeration;
-    @NotNull
-    @Size(min = 3, max = 120)
+    @NotNull(groups = NewEventConstraint.class)
+    @Size(min = 3, max = 120, groups = {NewEventConstraint.class, UpdateEventConstraint.class})
     private String title;
 }

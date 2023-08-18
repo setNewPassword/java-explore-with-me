@@ -3,18 +3,20 @@ package ru.practicum.ewm.controller.privates;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
 import ru.practicum.ewm.dto.event.UpdateEventRequest;
+import ru.practicum.ewm.dto.event.constraint.NewEventConstraint;
+import ru.practicum.ewm.dto.event.constraint.UpdateEventConstraint;
 import ru.practicum.ewm.dto.request.RequestDto;
 import ru.practicum.ewm.dto.request.RequestStatusUpdateDto;
 import ru.practicum.ewm.dto.request.RequestStatusUpdateResultDto;
 import ru.practicum.ewm.service.EventService;
 import ru.practicum.ewm.service.RequestService;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -30,7 +32,10 @@ public class EventPrivateController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventFullDto createEvent(@PathVariable Long userId, @Valid @RequestBody NewEventDto newEventDto) {
+    public EventFullDto createEvent(
+            @PathVariable Long userId,
+            @Validated(NewEventConstraint.class)
+            @RequestBody NewEventDto newEventDto) {
         newEventDto.setRequestModeration(Objects.requireNonNullElse(newEventDto.getRequestModeration(), true));
         newEventDto.setPaid(Objects.requireNonNullElse(newEventDto.getPaid(), false));
         newEventDto.setParticipantLimit(Objects.requireNonNullElse(newEventDto.getParticipantLimit(), 0));
@@ -60,7 +65,8 @@ public class EventPrivateController {
     @PatchMapping("/{eventId}")
     public EventFullDto updateEventByUser(@PathVariable Long userId,
                                           @PathVariable Long eventId,
-                                          @Valid @RequestBody UpdateEventRequest updateEventUserRequest) {
+                                          @Validated(UpdateEventConstraint.class)
+                                          @RequestBody UpdateEventRequest updateEventUserRequest) {
         return eventService.updateEventByUser(userId, eventId, updateEventUserRequest);
     }
 

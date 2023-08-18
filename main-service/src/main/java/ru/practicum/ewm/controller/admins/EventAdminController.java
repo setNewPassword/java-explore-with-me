@@ -7,9 +7,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.UpdateEventRequest;
+import ru.practicum.ewm.dto.event.constraint.UpdateEventConstraint;
 import ru.practicum.ewm.service.EventService;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -30,9 +30,9 @@ public class EventAdminController {
                                         @RequestParam(name = "rangeStart", required = false) String rangeStart,
                                         @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
                                         @RequestParam(name = "from", required = false, defaultValue = "0")
-                                            @PositiveOrZero Integer from,
+                                        @PositiveOrZero Integer from,
                                         @RequestParam(name = "size", required = false, defaultValue = "10")
-                                            @Positive Integer size) {
+                                        @Positive Integer size) {
         return eventService.getAllEventsByAdmin(users, states, categoriesId, rangeStart, rangeEnd,
                 PageRequest.of(from / size, size));
     }
@@ -41,7 +41,8 @@ public class EventAdminController {
     @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEvent(@NotNull @PathVariable(name = "eventId") Long eventId,
-                                    @Valid @RequestBody UpdateEventRequest updateEventAdminRequest) {
+                                    @Validated(UpdateEventConstraint.class)
+                                    @RequestBody UpdateEventRequest updateEventAdminRequest) {
         return eventService.updateEventByAdmin(eventId, updateEventAdminRequest);
     }
 
