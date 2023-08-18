@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.ewm.dto.category.CategoryDto;
-import ru.practicum.ewm.dto.user.UserShortDto;
+
 import ru.practicum.ewm.model.EventState;
 import ru.practicum.ewm.model.Formats;
 
@@ -16,17 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventFullDto /*extends EventShortDto*/ {
-    private Long id;
-    private String annotation;
-    private CategoryDto category;
-    private Integer confirmedRequests;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
-    private LocalDateTime eventDate;
-    private UserShortDto initiator;
-    private Boolean paid;
-    private String title;
-    private Long views;
+public class EventFullDto extends EventShortDto {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Formats.DATE)
     private String createdOn;

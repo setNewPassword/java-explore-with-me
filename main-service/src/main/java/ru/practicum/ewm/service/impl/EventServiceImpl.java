@@ -84,7 +84,12 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     @Override
     public List<EventShortDto> getEvents(Long userId, Pageable pageable) {
-        return eventMapper.toEventShortDtoList(eventRepository.findAllByInitiatorId(userId, pageable).toList());
+        List<EventShortDto> result = new ArrayList<>();
+        List<Event> eventsFromDb = eventRepository.findAllByInitiatorId(userId, pageable).toList();
+        for(Event event : eventsFromDb) {
+            result.add(eventMapper.toEventShortDto(event));
+        }
+        return result;
     }
 
     @Override
