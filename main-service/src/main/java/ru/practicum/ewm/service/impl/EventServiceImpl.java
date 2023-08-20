@@ -318,7 +318,7 @@ public class EventServiceImpl implements EventService {
         events.forEach(eventShortDto ->
                 eventShortDto.setViews(viewStatsMap.getOrDefault(eventShortDto.getId(), 0L)));
 
-        if(EventSortValue.VIEWS.equals(sort)) {
+        if (EventSortValue.VIEWS.equals(sort)) {
             eventEntities.sort(Comparator.comparing(Event::getViews));
         }
 
