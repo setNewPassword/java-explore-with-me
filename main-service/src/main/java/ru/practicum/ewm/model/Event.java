@@ -42,6 +42,7 @@ public class Event {
     @Column(nullable = false, length = 120)
     private String title;
 
+    @Transient
     private Long views;
 
     @Column(nullable = false, name = "created_On")

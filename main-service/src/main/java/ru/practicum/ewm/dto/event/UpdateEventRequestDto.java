@@ -10,7 +10,7 @@ import ru.practicum.ewm.model.StateAction;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateEventRequest extends NewEventDto {
+public class UpdateEventRequestDto extends NewEventDto {
 
     private StateAction stateAction;
 

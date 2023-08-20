@@ -3,6 +3,7 @@ package ru.practicum.ewm.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.category.NewCategoryDto;
 import ru.practicum.ewm.exception.CategoryIsNotEmptyException;
@@ -18,6 +19,7 @@ import ru.practicum.ewm.service.CategoryService;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
@@ -25,6 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional
     public CategoryDto addNewCategory(NewCategoryDto newCategoryDto) {
         if (categoryRepository.existsByName(newCategoryDto.getName())) {
             throw new CategoryNameAlreadyExistException("Категория с таким названием уже существует!");
@@ -34,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategory(Long catId) {
         if (eventRepository.existsByCategoryId(catId)) {
             throw new CategoryIsNotEmptyException("Невозможно удалить категорию — она используется в событиях.");
@@ -42,6 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() ->

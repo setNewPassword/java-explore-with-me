@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
-import ru.practicum.ewm.dto.event.UpdateEventRequest;
-import ru.practicum.ewm.dto.event.constraint.NewEventConstraint;
-import ru.practicum.ewm.dto.event.constraint.UpdateEventConstraint;
+import ru.practicum.ewm.dto.event.UpdateEventRequestDto;
+import ru.practicum.ewm.dto.group.*;
 import ru.practicum.ewm.dto.request.RequestDto;
 import ru.practicum.ewm.dto.request.RequestStatusUpdateDto;
 import ru.practicum.ewm.dto.request.RequestStatusUpdateResultDto;
@@ -24,6 +23,7 @@ import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/users/{userId}/events")
 public class EventPrivateController {
     private final EventService eventService;
@@ -34,7 +34,7 @@ public class EventPrivateController {
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(
             @PathVariable Long userId,
-            @Validated(NewEventConstraint.class)
+            @Validated(NewGroup.class)
             @RequestBody NewEventDto newEventDto) {
         newEventDto.setRequestModeration(Objects.requireNonNullElse(newEventDto.getRequestModeration(), true));
         newEventDto.setPaid(Objects.requireNonNullElse(newEventDto.getPaid(), false));
@@ -65,8 +65,8 @@ public class EventPrivateController {
     @PatchMapping("/{eventId}")
     public EventFullDto updateEventByUser(@PathVariable Long userId,
                                           @PathVariable Long eventId,
-                                          @Validated(UpdateEventConstraint.class)
-                                          @RequestBody UpdateEventRequest updateEventUserRequest) {
+                                          @Validated(UpdateGroup.class)
+                                          @RequestBody UpdateEventRequestDto updateEventUserRequest) {
         return eventService.updateEventByUser(userId, eventId, updateEventUserRequest);
     }
 

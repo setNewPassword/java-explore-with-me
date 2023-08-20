@@ -2,8 +2,10 @@ package ru.practicum.ewm.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.compilation.NewCompilationDto;
 import ru.practicum.ewm.exception.CompilationNotExistException;
@@ -14,21 +16,17 @@ import ru.practicum.ewm.repository.CompilationRepository;
 import ru.practicum.ewm.repository.EventRepository;
 import ru.practicum.ewm.service.CompilationService;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class CompilationServiceImpl implements CompilationService {
+    private final CompilationMapper compilationMapper;
     private final EventRepository eventRepository;
-    private final EntityManager entityManager;
     private final CompilationRepository compilationRepository;
     private final CompilationMapper mapper;
 
@@ -47,17 +45,19 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public void deleteCompilation(Long compId) {
         compilationRepository.deleteById(compId);
         log.debug("Подборка с id = {} удалена.", compId);
     }
 
     @Override
+    @Transactional
     public CompilationDto updateCompilation(Long compId, NewCompilationDto updateCompilationRequestDto) {
         Compilation oldCompilation = compilationRepository.findById(compId)
                 .orElseThrow(() ->
                         new CompilationNotExistException(String.format("Невозможно обновить подборку — " +
-                        "подборка с id = %d не существует.", compId)));
+                                "подборка с id = %d не существует.", compId)));
         List<Long> eventsIds = updateCompilationRequestDto.getEvents();
         if (eventsIds != null) {
             List<Event> events = eventRepository.findAllByIdIn(updateCompilationRequestDto.getEvents());
@@ -75,36 +75,25 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public List<CompilationDto> getCompilations(Boolean pinned, Pageable pageable) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Compilation> query = builder.createQuery(Compilation.class);
-
-        Root<Compilation> root = query.from(Compilation.class);
-        Predicate criteria = builder.conjunction();
-
-        if (pinned != null) {
-            Predicate isPinned;
-            if (pinned) {
-                isPinned = builder.isTrue(root.get("pinned"));
-            } else {
-                isPinned = builder.isFalse(root.get("pinned"));
-            }
-            criteria = builder.and(criteria, isPinned);
+    public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
+        int pageNum = from / size;
+        Pageable pageable = PageRequest.of(pageNum, Math.toIntExact(size));
+        List<Compilation> compilations;
+        if (pinned == null) {
+            compilations = compilationRepository.getCompilations(pageable);
+        } else {
+            compilations = compilationRepository.getCompilationsByPinned(pinned, pageable);
         }
-
-        query.select(root).where(criteria);
-        List<Compilation> compilations = entityManager.createQuery(query)
-                .setFirstResult(pageable.getPageNumber())
-                .setMaxResults(pageable.getPageSize())
-                .getResultList();
-
-        return mapper.toListCompilationDto(compilations);
+        return compilations
+                .stream()
+                .map(compilationMapper::toCompilationDto)
+                .collect(Collectors.toList());
     }
 
+    @Override
     public CompilationDto getCompilationById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new CompilationNotExistException("Compilation doesn't exist"));
         return mapper.toCompilationDto(compilation);
     }
-
 }

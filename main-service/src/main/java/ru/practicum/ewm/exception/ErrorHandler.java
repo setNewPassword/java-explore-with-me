@@ -39,8 +39,7 @@ public class ErrorHandler {
             ParticipantLimitException.class,
             RequestAlreadyConfirmedException.class,
             CategoryNameAlreadyExistException.class,
-            AlreadyExistsException.class,
-            ConstraintViolationException.class
+            AlreadyExistsException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
@@ -56,7 +55,8 @@ public class ErrorHandler {
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
             MethodArgumentTypeMismatchException.class,
-            MissingServletRequestParameterException.class
+            MissingServletRequestParameterException.class,
+            ConstraintViolationException.class
     })
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -7,10 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.dto.event.EventFullDto;
-import ru.practicum.ewm.dto.event.EventShortDto;
-import ru.practicum.ewm.dto.event.NewEventDto;
-import ru.practicum.ewm.dto.event.UpdateEventRequest;
+import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.exception.*;
 import ru.practicum.ewm.mapper.EventMapper;
 import ru.practicum.ewm.mapper.LocationMapper;
@@ -29,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
@@ -41,16 +39,15 @@ public class EventServiceImpl implements EventService {
     private static final String APP_NAME = "ewm-main-service";
 
     @Override
+    @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotExistException(String
                         .format("Пользователь с id = %d не найден.", userId)));
         checkEventTime(newEventDto.getEventDate());
-        Location location = locationMapper.toLocation(newEventDto.getLocation());
-        setIdToLocation(location);
         Event eventToSave = eventMapper.toEventModel(newEventDto);
-        eventToSave.setLocation(location);
+        eventToSave.setLocation(setIdToLocation(newEventDto.getLocation()));
         eventToSave.setState(EventState.PENDING);
         eventToSave.setConfirmedRequests(0);
         eventToSave.setCreatedOn(LocalDateTime.now());
@@ -64,15 +61,10 @@ public class EventServiceImpl implements EventService {
         return eventMapper.toEventFullDto(saved);
     }
 
-    private void setIdToLocation(Location location) {
-        Optional<Location> savedLocationOpt = locationRepository.findByLatAndLon(location.getLat(), location.getLat());
-        long locationId;
-        if (savedLocationOpt.isEmpty()) {
-            locationId = locationRepository.save(location).getId();
-        } else {
-            locationId = savedLocationOpt.get().getId();
-        }
-        location.setId(locationId);
+    private Location setIdToLocation(LocationDto locationDto) {
+        Optional<Location> savedLocationOpt = locationRepository
+                .findByLatAndLon(locationDto.getLat(), locationDto.getLat());
+        return savedLocationOpt.orElseGet(() -> locationRepository.save(locationMapper.toLocation(locationDto)));
     }
 
     private void checkEventTime(LocalDateTime start) {
@@ -81,7 +73,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<EventShortDto> getEvents(Long userId, Pageable pageable) {
         List<EventShortDto> result = new ArrayList<>();
@@ -92,8 +83,9 @@ public class EventServiceImpl implements EventService {
         return result;
     }
 
+    @Transactional
     @Override
-    public EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequest updateEventAdminRequest) {
+    public EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequestDto updateEventAdminRequest) {
 
         Event eventToUpdate = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
@@ -125,8 +117,9 @@ public class EventServiceImpl implements EventService {
         return eventMapper.toEventFullDto(eventRepository.save(eventToUpdate));
     }
 
+    @Transactional
     @Override
-    public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventRequest updateEventUserRequest) {
+    public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventRequestDto updateEventUserRequest) {
 
         Event eventFromDb = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
@@ -152,7 +145,7 @@ public class EventServiceImpl implements EventService {
         return eventMapper.toEventFullDto(eventFromDb);
     }
 
-    private void updateEventEntity(UpdateEventRequest event, Event eventToUpdate) {
+    private void updateEventEntity(UpdateEventRequestDto event, Event eventToUpdate) {
         eventToUpdate.setAnnotation(Objects.requireNonNullElse(event.getAnnotation(), eventToUpdate.getAnnotation()));
         eventToUpdate.setCategory(event.getCategory() == null
                 ? eventToUpdate.getCategory()
@@ -173,7 +166,6 @@ public class EventServiceImpl implements EventService {
         eventToUpdate.setTitle(Objects.requireNonNullElse(event.getTitle(), eventToUpdate.getTitle()));
     }
 
-    @Transactional(readOnly = true)
     @Override
     public EventFullDto getEventByUser(Long userId, Long eventId) {
         return eventMapper.toEventFullDto(eventRepository.findByIdAndInitiatorId(eventId, userId)
@@ -298,7 +290,7 @@ public class EventServiceImpl implements EventService {
             }
         }
         final Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                Sort.by(EventSortValue.EVENT_DATE.equals(sort) ? "eventDate" : "views"));
+                Sort.by("eventDate"));
         List<Event> eventEntities = eventRepository.searchPublishedEvents(
                         categories,
                         paid,
@@ -325,6 +317,11 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
         events.forEach(eventShortDto ->
                 eventShortDto.setViews(viewStatsMap.getOrDefault(eventShortDto.getId(), 0L)));
+
+        if(EventSortValue.VIEWS.equals(sort)) {
+            eventEntities.sort(Comparator.comparing(Event::getViews));
+        }
+
         return events;
 
     }

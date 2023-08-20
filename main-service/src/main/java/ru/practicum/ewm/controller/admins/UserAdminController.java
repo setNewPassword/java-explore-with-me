@@ -3,6 +3,7 @@ package ru.practicum.ewm.controller.admins;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.service.UserService;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping(path = "/admin/users")
 public class UserAdminController {
     private final UserService userService;

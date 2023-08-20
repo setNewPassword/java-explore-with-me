@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
@@ -27,7 +28,6 @@ public class RequestServiceImpl implements RequestService {
     private final RequestMapper requestMapper;
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
     @Override
     public List<RequestDto> getRequestsByOwnerOfEvent(Long userId, Long eventId) {
         if (!userRepository.existsById(userId)) {
@@ -38,6 +38,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestDto createRequest(Long userId, Long eventId) {
         User requester = userRepository
                 .findById(userId)
@@ -80,6 +81,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestDto cancelRequests(Long userId, Long requestId) {
         Request request = requestRepository.findByRequesterIdAndId(userId, requestId)
                 .orElseThrow(() -> new RequestNotExistException(String
@@ -88,7 +90,6 @@ public class RequestServiceImpl implements RequestService {
         return requestMapper.toRequestDto(requestRepository.save(request));
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<RequestDto> getCurrentUserRequests(Long userId) {
         if (!userRepository.existsById(userId)) {
@@ -97,8 +98,8 @@ public class RequestServiceImpl implements RequestService {
         return requestMapper.toRequestDtoList(requestRepository.findAllByRequesterId(userId));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public RequestStatusUpdateResultDto updateRequests(Long userId, Long eventId,
                                                        RequestStatusUpdateDto requestStatusUpdateDto) {
         Event event = eventRepository.findById(eventId)
