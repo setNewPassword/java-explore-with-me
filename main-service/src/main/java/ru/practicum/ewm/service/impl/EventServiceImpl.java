@@ -47,7 +47,7 @@ public class EventServiceImpl implements EventService {
                         .format("Пользователь с id = %d не найден.", userId)));
         checkEventTime(newEventDto.getEventDate());
         Event eventToSave = eventMapper.toEventModel(newEventDto);
-        eventToSave.setLocation(setIdToLocation(newEventDto.getLocation()));
+        eventToSave.setLocation(findOrCreateLocation(newEventDto.getLocation()));
         eventToSave.setState(EventState.PENDING);
         eventToSave.setConfirmedRequests(0);
         eventToSave.setCreatedOn(LocalDateTime.now());
@@ -61,7 +61,7 @@ public class EventServiceImpl implements EventService {
         return eventMapper.toEventFullDto(saved);
     }
 
-    private Location setIdToLocation(LocationDto locationDto) {
+    private Location findOrCreateLocation(LocationDto locationDto) {
         Optional<Location> savedLocationOpt = locationRepository
                 .findByLatAndLon(locationDto.getLat(), locationDto.getLat());
         return savedLocationOpt.orElseGet(() -> locationRepository.save(locationMapper.toLocation(locationDto)));
@@ -289,8 +289,14 @@ public class EventServiceImpl implements EventService {
                 }
             }
         }
-        final Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                Sort.by("eventDate"));
+        final Pageable pageRequest;
+        if (EventSortValue.EVENT_DATE.equals(sort)) {
+            pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                    Sort.by("eventDate"));
+        } else {
+            pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+        }
+
         List<Event> eventEntities = eventRepository.searchPublishedEvents(
                         categories,
                         paid,
