@@ -5,6 +5,7 @@ import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.event.EventShortDto;
 import ru.practicum.ewm.dto.event.NewEventDto;
 import ru.practicum.ewm.dto.event.UpdateEventRequestDto;
+import ru.practicum.ewm.model.Event;
 import ru.practicum.ewm.model.EventSortValue;
 
 import java.util.List;
@@ -40,4 +41,6 @@ public interface EventService {
                                              String ip);
 
     EventFullDto getEvent(Long id, String uri, String ip);
+
+    Event getEventById(Long eventId);
 }

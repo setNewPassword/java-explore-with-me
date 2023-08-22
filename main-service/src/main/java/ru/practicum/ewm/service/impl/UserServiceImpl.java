@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.exception.NameAlreadyExistException;
+import ru.practicum.ewm.exception.UserNotFoundException;
 import ru.practicum.ewm.mapper.UserMapper;
+import ru.practicum.ewm.model.User;
 import ru.practicum.ewm.repository.UserRepository;
 import ru.practicum.ewm.service.UserService;
 
@@ -41,5 +43,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(String.format("Пользователь с id = %d не найден.",
+                        userId)));
     }
 }

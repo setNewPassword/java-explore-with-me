@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.compilation.NewCompilationDto;
-import ru.practicum.ewm.exception.CompilationNotExistException;
+import ru.practicum.ewm.exception.CompilationNotFoundException;
 import ru.practicum.ewm.mapper.CompilationMapper;
 import ru.practicum.ewm.model.Compilation;
 import ru.practicum.ewm.model.Event;
@@ -56,7 +56,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto updateCompilation(Long compId, NewCompilationDto updateCompilationRequestDto) {
         Compilation oldCompilation = compilationRepository.findById(compId)
                 .orElseThrow(() ->
-                        new CompilationNotExistException(String.format("Невозможно обновить подборку — " +
+                        new CompilationNotFoundException(String.format("Невозможно обновить подборку — " +
                                 "подборка с id = %d не существует.", compId)));
         List<Long> eventsIds = updateCompilationRequestDto.getEvents();
         if (eventsIds != null) {
@@ -93,7 +93,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto getCompilationById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new CompilationNotExistException("Compilation doesn't exist"));
+                .orElseThrow(() -> new CompilationNotFoundException("Compilation doesn't exist"));
         return mapper.toCompilationDto(compilation);
     }
 }
