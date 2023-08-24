@@ -8,7 +8,6 @@ import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.exception.NameAlreadyExistException;
 import ru.practicum.ewm.exception.UserNotFoundException;
 import ru.practicum.ewm.mapper.UserMapper;
-import ru.practicum.ewm.model.User;
 import ru.practicum.ewm.repository.UserRepository;
 import ru.practicum.ewm.service.UserService;
 
