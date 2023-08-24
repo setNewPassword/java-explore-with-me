@@ -72,8 +72,3 @@ CREATE TABLE IF NOT EXISTS comments
     author_id  BIGINT REFERENCES users (id) ON DELETE CASCADE,
     event_id   BIGINT REFERENCES events (id) ON DELETE CASCADE
 );
-
-/*
-CREATE INDEX IF NOT EXISTS annotation_index ON events (annotation);
-
-CREATE INDEX IF NOT EXISTS description_index ON events (description);*/

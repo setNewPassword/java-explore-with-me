@@ -1,8 +1,8 @@
 package ru.practicum.ewm.service.impl;
 
-import ru.practicum.ewm.exception.CommentNotFoundException;
-import ru.practicum.ewm.exception.EventNotPublishedException;
-import ru.practicum.ewm.exception.UserIsNotAnAuthorException;
+import ru.practicum.ewm.exception.*;
+import ru.practicum.ewm.repository.EventRepository;
+import ru.practicum.ewm.repository.UserRepository;
 import ru.practicum.ewm.service.CommentService;
 
 import lombok.RequiredArgsConstructor;
@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.service.EventService;
-import ru.practicum.ewm.service.UserService;
 import ru.practicum.ewm.dto.comment.CommentDto;
 import ru.practicum.ewm.dto.comment.NewCommentDto;
 import ru.practicum.ewm.model.EventState;
@@ -22,6 +20,7 @@ import ru.practicum.ewm.model.User;
 import ru.practicum.ewm.repository.CommentRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -31,8 +30,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CommentServiceImpl implements CommentService {
-    private final UserService userService;
-    private final EventService eventService;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
 
@@ -49,11 +48,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> getCommentsByPrivate(Long userId, Long eventId, Pageable pageable) {
-        userService.getUserById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(String.format("Пользователь с id = %d не найден.", userId));
+        }
 
         List<Comment> comments;
-        if (eventId != null) {
-            eventService.getEventById(eventId);
+        if (eventId != null && eventRepository.existsById(eventId)) {
             comments = commentRepository.findAllByAuthorIdAndEventId(userId, eventId);
         } else {
             comments = commentRepository.findAllByAuthorId(userId);
@@ -65,8 +65,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentDto createByPrivate(Long userId, Long eventId, NewCommentDto newCommentDto) {
-        User user = userService.getUserById(userId);
-        Event event = eventService.getEventById(eventId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(String
+                        .format("Пользователь с id = %d не найден.", userId)));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(String
+                .format("Событие с id = %d не найдено.", eventId)));
 
         if (!event.getState().equals(EventState.PUBLISHED)) {
             throw new EventNotPublishedException("Невозможно добавить комментарий к этому событию.");
@@ -85,7 +88,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentDto updateByPrivate(Long userId, Long commentId, NewCommentDto newCommentDto) {
-        userService.getUserById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(String.format("Пользователь с id = %d не найден.", userId));
+        }
 
         Comment commentFromRepository = getCommentById(commentId);
 
@@ -100,7 +105,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteByPrivate(Long userId, Long commentId) {
-        userService.getUserById(userId);
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(String.format("Пользователь с id = %d не найден.", userId));
+        }
 
         checkUserIsAuthor(userId, getCommentById(commentId).getAuthor().getId());
 
@@ -109,9 +116,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> getCommentsByPublic(Long eventId, Pageable pageable) {
-        eventService.getEventById(eventId);
+        List<Comment> comments = new ArrayList<>();
+        if (eventRepository.existsById(eventId)) {
+            comments = commentRepository.findAllByEventId(eventId, pageable);
+        } else {
+            throw new EventNotFoundException(String.format("Событие с id = %d не найдено.", eventId));
+        }
 
-        return toCommentsDto(commentRepository.findAllByEventId(eventId, pageable));
+        return toCommentsDto(comments);
     }
 
     @Override

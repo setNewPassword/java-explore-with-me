@@ -72,16 +72,14 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ApiError handleUserNotFoundException(final UserNotFoundException exception) {
-        return new ApiError("Невозможно удалить пользователя с этим id.",
-                "Такой пользователь не существует.",
+    public ApiError handleEntityNotFoundException(final EntityNotFoundException exception) {
+        return new ApiError(exception.getMessage(),"Сущность не найдена.",
                 HttpStatus
                         .NOT_FOUND
                         .getReasonPhrase()
                         .toUpperCase(),
                 LocalDateTime.now().format(DATE_FORMATTER));
     }
-
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -97,55 +95,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public ApiError handleCompilationNotFoundException(final CompilationNotFoundException exception) {
-        return new ApiError("Невозможно удалить подборку с этим id.",
-                "Такая подборка не существует.",
-                HttpStatus
-                        .NOT_FOUND
-                        .getReasonPhrase()
-                        .toUpperCase(),
-                LocalDateTime.now().format(DATE_FORMATTER));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public ApiError handleRequestNotFoundException(final RequestNotFoundException exception) {
-        return new ApiError(exception.getMessage(), "Запрос с таким id не существует.",
-                HttpStatus
-                        .NOT_FOUND
-                        .getReasonPhrase()
-                        .toUpperCase(),
-                LocalDateTime.now().format(DATE_FORMATTER));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public ApiError handleEventNotFoundException(final EventNotFoundException exception) {
-        return new ApiError(exception.getMessage(), "Событие с таким id не существует.",
-                HttpStatus
-                        .NOT_FOUND
-                        .getReasonPhrase()
-                        .toUpperCase(),
-                LocalDateTime.now().format(DATE_FORMATTER));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleCategoryNotExistException(final CategoryNotExistException exception) {
-        return new ApiError("Невозможно удалить категорию с этим id.", "Такая категория не существует.",
-                HttpStatus
-                        .NOT_FOUND
-                        .getReasonPhrase()
-                        .toUpperCase(),
-                LocalDateTime.now().format(DATE_FORMATTER));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleCommentNotFoundException(final CommentNotFoundException exception) {
         return new ApiError("Невозможно удалить категорию с этим id.", "Такая категория не существует.",
                 HttpStatus
                         .NOT_FOUND
