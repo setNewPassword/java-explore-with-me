@@ -11,4 +11,6 @@ public interface UserService {
     List<UserDto> getUsers(List<Long> ids, Pageable pageable);
 
     void deleteUser(Long userId);
+
+    UserDto getUserById(Long userId);
 }

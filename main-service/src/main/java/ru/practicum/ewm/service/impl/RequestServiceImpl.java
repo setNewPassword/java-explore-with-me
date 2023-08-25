@@ -31,7 +31,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestDto> getRequestsByOwnerOfEvent(Long userId, Long eventId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserNotExistException(String.format("Пользователь с id = %d не найден.", userId));
+            throw new UserNotFoundException(String.format("Пользователь с id = %d не найден.", userId));
         }
         List<Request> requests = requestRepository.findAllByRequesterId(userId);
         return requestMapper.toRequestDtoList(requestRepository.findAllByEventWithInitiator(userId, eventId));
@@ -42,11 +42,11 @@ public class RequestServiceImpl implements RequestService {
     public RequestDto createRequest(Long userId, Long eventId) {
         User requester = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new UserNotExistException(String
+                .orElseThrow(() -> new UserNotFoundException(String
                         .format("Пользователь с id = %d не найден.", userId)));
         Event event = eventRepository
                 .findById(eventId)
-                .orElseThrow(() -> new EventNotExistException(String
+                .orElseThrow(() -> new EventNotFoundException(String
                         .format("Событие с id = %d не найдено.", eventId)));
         Request request = new Request(LocalDateTime.now(), event, requester, RequestStatus.PENDING);
         Optional<Request> requests = requestRepository.findByRequesterIdAndEventId(userId, eventId);
@@ -84,7 +84,7 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public RequestDto cancelRequests(Long userId, Long requestId) {
         Request request = requestRepository.findByRequesterIdAndId(userId, requestId)
-                .orElseThrow(() -> new RequestNotExistException(String
+                .orElseThrow(() -> new RequestNotFoundException(String
                         .format("Запрос с id = %d не найден.", requestId)));
         request.setStatus(RequestStatus.CANCELED);
         return requestMapper.toRequestDto(requestRepository.save(request));
@@ -93,7 +93,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestDto> getCurrentUserRequests(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserNotExistException(String.format("Пользователь с id = %d не найден.", userId));
+            throw new UserNotFoundException(String.format("Пользователь с id = %d не найден.", userId));
         }
         return requestMapper.toRequestDtoList(requestRepository.findAllByRequesterId(userId));
     }
@@ -103,7 +103,7 @@ public class RequestServiceImpl implements RequestService {
     public RequestStatusUpdateResultDto updateRequests(Long userId, Long eventId,
                                                        RequestStatusUpdateDto requestStatusUpdateDto) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
+                .orElseThrow(() -> new EventNotFoundException(String.format("Событие с id = %d не найдено.", eventId)));
         RequestStatusUpdateResultDto result = new RequestStatusUpdateResultDto();
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {

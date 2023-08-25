@@ -40,4 +40,6 @@ public interface EventService {
                                              String ip);
 
     EventFullDto getEvent(Long id, String uri, String ip);
+
+    EventFullDto getEventById(Long eventId);
 }

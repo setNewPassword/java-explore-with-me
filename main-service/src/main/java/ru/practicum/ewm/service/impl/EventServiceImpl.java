@@ -43,7 +43,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotExistException(String
+                .orElseThrow(() -> new UserNotFoundException(String
                         .format("Пользователь с id = %d не найден.", userId)));
         checkEventTime(newEventDto.getEventDate());
         Event eventToSave = eventMapper.toEventModel(newEventDto);
@@ -88,7 +88,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequestDto updateEventAdminRequest) {
 
         Event eventToUpdate = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
+                .orElseThrow(() -> new EventNotFoundException(String.format("Событие с id = %d не найдено.", eventId)));
         if (updateEventAdminRequest.getEventDate() != null) {
             checkEventTime(updateEventAdminRequest.getEventDate());
         }
@@ -122,7 +122,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventRequestDto updateEventUserRequest) {
 
         Event eventFromDb = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
+                .orElseThrow(() -> new EventNotFoundException(String.format("Событие с id = %d не найдено.", eventId)));
         if (eventFromDb.getState().equals(EventState.CANCELED) || eventFromDb.getState().equals(EventState.PENDING)) {
             if (updateEventUserRequest.getEventDate() != null
                     && updateEventUserRequest.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
@@ -169,7 +169,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventByUser(Long userId, Long eventId) {
         return eventMapper.toEventFullDto(eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new EventNotExistException(String
+                .orElseThrow(() -> new EventNotFoundException(String
                         .format("Событие с id = %d не найдено.", eventId))));
     }
 
@@ -336,7 +336,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getEvent(Long eventId, String uri, String ip) {
 
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
-                .orElseThrow(() -> new EventNotExistException(String.format("Событие с id = %d не найдено.", eventId)));
+                .orElseThrow(() -> new EventNotFoundException(String.format("Событие с id = %d не найдено.", eventId)));
 
         statsClient.addHit(APP_NAME, uri, ip, LocalDateTime.now());
 
@@ -348,4 +348,9 @@ public class EventServiceImpl implements EventService {
         return eventDto;
     }
 
+    @Override
+    public EventFullDto getEventById(Long eventId) {
+        return eventMapper.toEventFullDto(eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException(String.format("Событие с id = %d не найдено.", eventId))));
+    }
 }

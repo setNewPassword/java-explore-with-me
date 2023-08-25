@@ -72,59 +72,20 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ApiError handleUserNotExistException(final UserNotExistException exception) {
-        return new ApiError("Невозможно удалить пользователя с этим id.",
-                "Такой пользователь не существует.",
+    public ApiError handleEntityNotFoundException(final EntityNotFoundException exception) {
+        return new ApiError(exception.getMessage(),"Сущность не найдена.",
                 HttpStatus
                         .NOT_FOUND
                         .getReasonPhrase()
                         .toUpperCase(),
                 LocalDateTime.now().format(DATE_FORMATTER));
     }
-
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ApiError handleEmptyResultDataAccessException(final EmptyResultDataAccessException exception) {
         return new ApiError("Невозможно выполнить операцию.", "Данные не найдены.",
-                HttpStatus
-                        .NOT_FOUND
-                        .getReasonPhrase()
-                        .toUpperCase(),
-                LocalDateTime.now().format(DATE_FORMATTER));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public ApiError handleCompilationNotExistException(final CompilationNotExistException exception) {
-        return new ApiError("Невозможно удалить подборку с этим id.",
-                "Такая подборка не существует.",
-                HttpStatus
-                        .NOT_FOUND
-                        .getReasonPhrase()
-                        .toUpperCase(),
-                LocalDateTime.now().format(DATE_FORMATTER));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public ApiError handleRequestNotExistException(final RequestNotExistException exception) {
-        return new ApiError(exception.getMessage(), "Запрос с таким id не существует.",
-                HttpStatus
-                        .NOT_FOUND
-                        .getReasonPhrase()
-                        .toUpperCase(),
-                LocalDateTime.now().format(DATE_FORMATTER));
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public ApiError handleEventNotExistException(final EventNotExistException exception) {
-        return new ApiError(exception.getMessage(), "Событие с таким id не существует.",
                 HttpStatus
                         .NOT_FOUND
                         .getReasonPhrase()
@@ -145,7 +106,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleCategoryNotExistException(final EventValidationException exception) {
+    public ApiError handleEventValidationException(final EventValidationException exception) {
         return new ApiError(exception.getMessage(), "Для запрошенной операции не выполняются условия.",
                 HttpStatus
                         .BAD_REQUEST
@@ -160,6 +121,31 @@ public class ErrorHandler {
         return new ApiError(throwable.getMessage(), "Внутренняя ошибка сервера.",
                 HttpStatus
                         .INTERNAL_SERVER_ERROR
+                        .getReasonPhrase()
+                        .toUpperCase(),
+                LocalDateTime.now().format(DATE_FORMATTER));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public ApiError handleEventNotPublishedException(final EventNotPublishedException exception) {
+        return new ApiError(exception.getMessage(), "Событие еще не опубликовано.",
+                HttpStatus
+                        .CONFLICT
+                        .getReasonPhrase()
+                        .toUpperCase(),
+                LocalDateTime.now().format(DATE_FORMATTER));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public ApiError handleUserIsNotAnAuthorException(final UserIsNotAnAuthorException exception) {
+        return new ApiError(exception
+                .getMessage(), "Пользователь не имеет доступа к управлению этим комментарием.",
+                HttpStatus
+                        .CONFLICT
                         .getReasonPhrase()
                         .toUpperCase(),
                 LocalDateTime.now().format(DATE_FORMATTER));
